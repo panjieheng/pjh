@@ -1,0 +1,644 @@
+etc/shells  存放所有shell
+系统中没有的shell    [ ksh ]        yum -y install ksh安装它
+
+修改用户的shell 
+	1.修改passwd文件
+	2.usermod  -s /bin/bash zhangsan   
+	
+	echo  $0  查看当前使用的shell
+	
+历史记录
+   /etc/profile    修改历史命令记录条数
+  history -c 	   清除历史命令记录  临时清除
+  清空或删除家目录中 .bash_history文件   永久清除历史命令记录
+     >      >>     &>     2>    2>>  
+     [ >&2 :将错误信息变成正确输出 ] 
+
+/#!/bin/bash
+  for i in {1..10}
+    do
+    useradd $i  &>  /dev/null
+    echo $i 创建成功
+  down
+
+
+不加权限直接运行:
+bash 会产生子进程
+source  .  不会产生子进程
+
+set 列出所有变量
+
+
+运算
+  expr： 整数运算  + 加,-减,\*乘,/除,%求模（取余）     
+   例：expr  10 % 3   运算结果为1
+
+  $[]  $(())  可直接运算  echo $[1+2]  echo $((1+1+1+1)) 
+
+  let  c=a+b ; echo $c
+  let i++      # i++(i=i+1)
+  let i--      # i--(i=i-1)
+
+
+  bc   用法  echo '1.11+2'| bc
+             echo 'scale=3;10/3'| bc  
+
+   expr  $a + 1
+   echo  $[1+2]
+   let   i++;
+—————————————————————————————————
+
+  测试
+	[ $USER == root ]  等于为真
+	[ $USER != root ]  不等于为真
+ 
+	&&  前面为真执行后面  [ 1 -eq 1 ] && ls
+	||  前面不为真执行后面  [ 1 -eq 2 ] || ls
+	;   执行完前面 再执行后面
+	[ -z $a ] 判断变量是否为空值
+ 	[ ! -z $a ] 不为空
+—————————————————————————————————
+  数值比较:
+	-eq		等于则为真
+	-ne		不等于则为真
+	-gt		大于则为真
+	-ge		大于等于则为真
+	-lt		小于则为真
+	-le		小于等于则为真
+————————————————————————————————
+  文件判断
+	参数    	说明
+	-e 文件名	如果文件存在则为真
+	-r 文件名	如果文件存在且可读则为真
+	-w 文件名	如果文件存在且可写则为真
+	-x 文件名	如果文件存在且可执行则为真
+	-d 文件名	如果文件存在且为目录则为真
+	-f 文件名	如果文件存在且为普通文件则为真
+	
+	-c 文件名	如果文件存在且为字符型特殊文件则为真
+	-b 文件名	如果文件存在且为块特殊文件则为真 
+	-s 文件名	如果文件存在且至少有一个字符则为真
+
+————————————————————————————————
+
+$RANDOM  产生随机数
+
+
+#!/bin/bash
+i=`echo $[ RANDOM%10+1 ]`
+read -p '我有一个数，你猜是多少:' o
+ $o -if
+   [eq $i ];then
+       echo   '恭喜你，猜对了'
+       exit
+elif
+   [ $o -gt $i ];then
+       echo    'sorry!!猜大了'
+else
+       echo   'sorry!!猜小了'
+fi
+
+
+————————————————————————————————
+
+for循环：
+
+#!/bin/bash
+x=0
+for i in {1..9}
+do
+        let x++
+        echo $x hiya
+done
+~      
+————————————————————————————
+#!/bin/bash
+x=0
+for i in `seq $1`    #seq  造数
+do 
+        let x++
+        echo $x hiya
+done
+————————————————————---------————————-————ping一个网段：
+
+#!/bin/bash
+x=0
+for i in {1..254}
+do
+        ping -c 3 -i 0.2 -w 1 172.25.0.$i >& /dev/null
+        if
+            [ $? -eq 0 ];then
+              echo 172.25.0."$i" 通了
+        else
+              echo 172.25.0."$i" 不通
+        fi
+
+done
+
+-------------------------------------------------------------
+
+
+for ((i=1;i<=5;i++))      c语言格式
+-------------------------------------------------------------
+
+while 死循环；
+
+#！/bin/bash
+i=0
+while [ 10 -ge $i ]
+do 
+    let i++
+    echo hello
+done	
+-----------------------------------------------------------	
+	循环猜数字
+	#!/bin/bash 
+num=$[RANDOM%100+1]
+while  [  10 -eq 10 ]
+do
+      read -p '请输入数字'  i
+                if
+                  [ $i -eq $num ];then
+                       echo 猜对了
+                          exit
+                 elif
+                  [ $i -gt $num ];then
+                         echo 大了
+                 else
+                         echo 小了
+                fi
+done
+~         
+------------------------------------------------------------	
+	99乘法表
+	
+#!/bin/bash 
+for i in {1..9}
+do
+  for j in `seq $i`
+     do
+      echo -n   "$i*$j=$[i*j]   "
+
+  done
+   echo " " 
+done
+~        	
+
+-----------------------------------------------------------
+case语法
+
+例：输入r或rr 输出f
+    输入f或ff 输出r
+    除此以外提示输入“r|rr  f|ff”
+    
+#!/bin/bash
+case $1 in
+r|rr)
+        echo f;;
+f|ff)
+        echo r;;
+*)
+        echo 请输入
+esac
+~    
+______________________________________________________________	
+	
+函数：
+
+类似别名  可以存储n多条命令
+	格式：
+	函数名（）{
+	命令1
+	命令2
+	.....
+	}
+	
+	
+echo -e "\033[35m TEST \033[0m"
+	
+	
+～～～～～～～～～～～～～～～～～～～～～～～～～～～～～～～～
+	
+fork炸弹
+
+ #！/bin/bash
+ .(){
+ .|.&
+ }
+ .
+	
+	
+____________________________________________________________
+	
+break可以结束整个循环；
+continue结束本次循环，进入下一次循环；
+exit结束整个脚本	
+	
+#!/bin/bash
+for i in {1..5}
+do
+   [ $i -eq 3 ] && break
+    echo hiya
+done
+  echo 'Game Over'
+	
+-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+	
+变量内容截取：
+   1.echo ${ 变量名：起始位置：长度  }	
+	 例：echo  ${a:5:2}
+
+   2. expr substr $变量名 起始位置  长度
+         例： expr substr $a 6 8
+         
+   3.echo $变量 | cut -b 起始位置-结束位置
+         例： echo $a | cut -b 5-6
+   4. echo ${#变量}	统计变量内容位数
+   
+截取随机值：
+
+定义变量：n=$[RANDOM%62]
+         echo ${a:n:1}	
+============================================================	
+替换子串：
+   echo ${变量名/要替换的字符/替换为}   #只替换第一个
+   echo ${变量名//要替换的字符/替换为} 	#替换所有
+  删除字串：
+   echo ${变量名/#*字符串：}    #从前往后删除第一个字符串
+   echo ${变量名/##字符串：}    #从前往后删除所有个字符串
+   echo ${变量名/%字符串：}     #从后往前删除一个字符串
+   echo ${变量名/%%字符串：}    #从后往前删除所有字符串 
+============================================================
+批量更改后缀名：
+
+ #!/bin/bash
+read -p '请输入原扩展名:'  a
+read -p '请输入要更改的扩展名:'  b
+for i in `ls *.$a`
+  do
+   mv $i ${i%.*}.$b
+done
+	
+	
+=============================================================	
+变量初始值处理：
+预定义变量值：
+  echo ${变量：- }
+ echo ${a:-123456}   	
+	
+	
+=============================================================
+
+expect工具：
+   yum -y install expect
+   
+   写脚本
+#！/bin/bash
+expect << EOF
+spawn ssh 172.25.0.11
+expect "password:"   {send "redhat\r"}   
+  #眼睛看到password，手输入‘redhat’
+expect "#"           {send "mkdir /ming\r"}
+expect "#"           {send "rm -rf /ming\r"}
+expect "#"           {send "exit\r"}
+EOF
+echo ""	
+	
+	
+	
+============================================================	
+数组：
+
+i = ( 11 22 33 )
+echo $i{i[0]} = 11
+echo $i{i[1]} = 22
+echo $i{i[2]} = 33
+======================================================	
+======================================================
+正则表达式：
+ 
+\{n,m}   	
+	
+======================================================	
+======================================================	
+sed  [选项]  编辑指令  文件
+选项：
+     -n 屏蔽默认输出
+     -i 直接修改文件内容
+     -r 启用扩展正则表达式，应为首先项
+     	
+编辑指令：
+      p 打印
+      d 删除
+      s 替换	
+	i 在行前插入
+      a 在行后插入
+	c 替换行
+   例：sed -n '/^good/p'   /mnt/1.txt	
+      sed -n '4,10p'  /mnt/1.txt 
+      sed -n '$='  /mnt/1.txt     	
+	
+替换:
+    sed  -n  's/旧/新/p'     文件     ：替换每行第一个
+ 	       's/旧/新/gp'    文件     ：替换全部
+ 	     
+ sed -r 's/(^.)(.*)(.$)/\3\2\1/'  1.txt
+ sed -r 's/^(.)(.)(.*)(.)(.)$/\1\4\3\2\5/'   1.txt 
+	
+======================================================	
+======================================================	
+	
+用法1：awk  选项  '[条件]{指令}'  文件
+	流量查询：
+  ifconfig  eth0 | awk '/RX p/{print "下载的数据量为：" $3}'
+	
+	
+
+用法2：awk  [选项]   'BEGIN{指令}{指令}END{指令}'  文件	
+	BEGIN{}	行前处理，读取文件内容前执行，指令执行1次
+              { }    	逐行处理，读取文件过程中执行，指令执行n次
+        END{}	行后处理，读取文件结束后执行，指令执行1次
+	
+例：统计用bash解释器的用户
+   awk 'BEGIN{x=0}/bash$/{x++} END{print x} ' /etc/passwd	
+	
+例：要求: 格式化输出passwd文件内容时，要求第一行为列表标题，中间打印用户的名称、UID、家目录信息，最后一行提示一共已处理文本的总行数
+[root@A ~]# awk  -F: 'BEGIN{print "User" "\t" "UID" "\t" "Home" }{print $1 "\t" $3 "\t" $6}END{print "Total" ,NR, "lines"}'    /etc/passwd	
+	
+	
+	~! 	反向匹配
+	
+单分支	awk  ‘{if(条件){编辑指令1}else{编辑指令2}}’
+双分支  awk  	'{if(条件){编辑指令1}else{编辑指令2}END{编辑指令3}}'
+	
+	
+	
+# uptime                 //查看CPU负载
+# ifconfig eth0          //查看网卡流量
+# free                   //查看内存信息
+# df                     //查看磁盘空间
+# wc -l /etc/passwd      //查看计算机账户数量
+# who |wc -l             //查看登录账户数量
+# rpm -qa |wc -l         //查看已安装软件包数量
+
+
+=======================================================
+
+
+查端口：netstat -untalp |grep httpd
+	             ss -untalp | grep 服务
+	
+	
+=======================================================
+	
+  传东西到四台虚拟机：
+
+	for i in 4.10 2.5 2.100 2.200
+          do
+		scp root@192.168.$i:/root
+	done
+	
+======================================================	
+		
+ 源码包安装流程：
+   	
+安装依赖
+ tar -xf
+ ./configure   --prefix=目录  ：指定安装目录
+ make
+ make install
+
+	程序的权限：
+  谁启动的程序  程序就继承谁的权限
+
+./configure的参数
+ --prefix  指定安装目录
+  --user   指定登陆用户
+  --group  指定用户组
+  --with-http_ssl_module  开启SSL加密功能
+
+=====================================================
+nginx 默认路径：/usr/local/nginx
+
+
+/usr/local/nginx 启服务
+
+/usr/local/nginx -s stop 关服务
+
+/usr/local/nginx -s reload 重新加载（必须在启动状态下进行）
+
+/usr/local/nginx -V 查看软件详细信息
+=====================================================
+
+查看端口：
+   netstart  
+	-a 显示所有端口信息
+	-n 以数字格式显示端口
+	-t 显示TCP连接的端口
+	-u 显示UPD连接的端口
+	-l 显示服务正在监听的端口信息
+	-p 显示监听端口的服务名称
+
+   -antulp  连用
+
+  curl http://192.168.4.5    （curl:命令行浏览器）
+======================================================
+删除软件：
+
+关闭软件——> 删除目录
+rm -rf /usr/local/nginx
+======================================================
+
+升级：
+1：./config
+2：make
+3：备份老文件
+4：killall 程序
+5：启动程序
+
+（4和5==make upgrade）
+
+=======================================================
+
+nginx配置文件：
+/usr/local/nginx/conf/nginx.conf
+
+events {
+    worker_connections  1024;  //并发量
+}
+
+
+基于域名的主机配置：
+server {
+        listen       80;                    //监听端口
+        server_name  server0.example.com;   //本机主机名
+	    root html;                          //主页文件路径
+	    index  index.html  index.htm        //默认首页
+                 }
+
+虚拟主机复制一份即可
+
+用户名密码验证设置：(添加两行)
+ auth_basic "Input Password:";                 //认证提示符
+ auth_basic_user_file "/usr/local/nginx/pass"; //认证密码文件,需要安装软件包来创建“pass”文件
+	#yum -y install httpd-tools
+
+	#htpasswd -c  /usr/local/nginx/文件名   用户名
+	#New password： 输入密码
+
+创建第二个用户时不需要加-c选项
+
+
+https加密算法：
+对称算法：AES ，DES    单机加密，如加密文件
+非对称算法：RSA ，DSA   网络数据加密
+信息摘要：MD5 ，sha256   数据完整性校验
+ 
+安全网页：
+  cd /usr/local/nginx/conf 
+    openssl genrsa > cert.key	#生成私钥
+	openssl req -new -x509 -key cert.key > cert./pem   #生成公钥
+
+
+LNMP动态网站部署：
+yum -y install mariadb mariadb-server mariadb-devel php php-fpm php-mysql
+
+启动：
+    nginx						：80
+	systemctl start maiad		：3306
+	systemctl start php-fpm 	：9000
+修改配置文件：
+	vim /usr/local/nginx/conf/nginx.conf
+		location / {	
+			root html;
+		}
+		location ~ \.php$ {
+			root html;
+			fastcgi_pass 127.0.0.1:9000
+		}
+
+
+动静分离：
+访问静态数据，直接找到文件返回
+访问动态数据，则转发给PHP 
+	location 匹配用户的地址栏
+ 
+PHP 监听端口：  127.0.0.1：9000
+
+	1.nginx未启动           				#无法连接
+	2.php-fpm未启动					#An Error.
+	3.没有修改nginx.conf[动静分离]  	#下载
+	4.test.php没有					#404 not found
+	5.test.php 语法错误     			#空白
+
+LNMP常见问题参考日志：
+	/usr/local/nginx/logs/access/log
+	/usr/local/nginx/logs/error.log
+	/var/log/php-fpm/www-error.log
+
+	
+地址重写：
+  rewrite  旧地址  新地址  	
+	
+	rewrite ^/(.*)  http://www.tmooc.cn/$1;
+         访问网站的任何页面跳转到  www.tmooccn.cn/任何
+
+
+#!/bin/bash
+yum -y install gcc pcre-devel openssl-devel
+useradd -s /sbin/nologin nginx
+tar -xf /root/lnmp_soft/nginx-1.12.2.tar.gz 
+cd /root/lnmp_soft/nginx-1.12.2
+sh configure --user=nginx --group=nginx --with-http_ssl_module
+echo "开始编译安装"
+make &>/dev/null
+make install &>/dev/null
+yum -y install   mariadb   mariadb-server   mariadb-devel
+yum -y  install  php   php-mysql
+cd /root/lnmp_soft
+yum -y install php-fpm-5.4.16-42.el7.x86_64.rpm
+yum -y install httpd
+systemctl start  mariadb
+systemctl enable mariadb
+systemctl start php-fpm 
+systemctl enable php-fpm
+setenforce 0  
+ln -s /usr/local/nginx/sbin/nginx /sbin/
+killall httpd
+nginx
+sed -i '65,68s/#//' /usr/local/nginx/conf/nginx.conf
+sed -i '70,71s/#//' /usr/local/nginx/conf/nginx.conf
+sed -i '70s/fastcgi_params/fastcgi.conf/' /usr/local/nginx/conf/nginx.conf
+nginx -s reload
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
